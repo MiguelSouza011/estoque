@@ -4,8 +4,8 @@ spring:
 
   datasource:
     url: jdbc:mysql://localhost:3306/estoque
-    username: root
-    password: Josi1012@
+    username: SEU_USERNAME
+    password: SUA_SENHA
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
