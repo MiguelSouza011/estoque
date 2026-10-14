@@ -1,419 +1,365 @@
 # 📦 Estoque API
 
-API REST para gerenciamento de estoque desenvolvida com **Java e Spring Boot**.
+API REST para gerenciamento de estoque desenvolvida com **Java e Spring Boot**, com foco em boas práticas de desenvolvimento backend, segurança, regras de negócio e integração com serviços de e-mail.
 
-O projeto foi desenvolvido com foco em praticar e aplicar conceitos de desenvolvimento backend, incluindo **arquitetura em camadas, JPA/Hibernate, relacionamentos entre entidades, DTOs, MapStruct, validação de dados, tratamento de exceções e regras de negócio**.
+O sistema permite gerenciar produtos, categorias, fornecedores e movimentações de estoque, além de controlar o acesso dos usuários por meio de autenticação JWT e enviar alertas automáticos quando produtos atingem níveis baixos de estoque.
 
 ## 🎯 Objetivo
 
-O objetivo do projeto é desenvolver uma API para gerenciamento de produtos e seus relacionamentos com categorias e fornecedores, além de controlar as movimentações de entrada e saída do estoque.
-
-A aplicação também busca aplicar boas práticas de desenvolvimento backend e organização de código, utilizando recursos do ecossistema Spring.
-
----
+Desenvolver uma API REST para gerenciamento de estoque, aplicando conceitos utilizados no desenvolvimento de aplicações backend, como arquitetura em camadas, persistência de dados, validação, tratamento de exceções, autenticação, autorização e integração com serviços externos.
 
 ## 🚀 Funcionalidades
 
 ### 📦 Produtos
 
-* Cadastro de produtos
-* Consulta de produtos
-* Consulta de produto por ID
-* Atualização de produtos
-* Exclusão de produtos
-* Busca de produtos por nome
-* Associação do produto a uma categoria
-* Associação do produto a um ou mais fornecedores
-* Controle da quantidade disponível em estoque
+- Cadastro, consulta, atualização e exclusão de produtos.
+- Busca de produtos por identificador e nome.
+- Associação de produtos a categorias.
+- Associação de produtos a fornecedores.
+- Controle da quantidade disponível em estoque.
+- Consulta de produtos com estoque baixo.
 
 ### 🗂️ Categorias
 
-* Cadastro de categorias
-* Consulta de categorias
-* Consulta por ID
-* Atualização
-* Exclusão
+- Cadastro de categorias.
+- Consulta de categorias e busca por identificador.
+- Atualização e exclusão de categorias.
+- Associação de categorias aos produtos.
 
 ### 🏢 Fornecedores
 
-* Cadastro de fornecedores
-* Consulta de fornecedores
-* Consulta por ID
-* Atualização
-* Exclusão
-* Validação de CNPJ
-* Associação com produtos
+- Cadastro, consulta, atualização e exclusão de fornecedores.
+- Validação de CNPJ.
+- Associação de fornecedores aos produtos.
 
 ### 🔄 Movimentações de estoque
 
-O projeto possui controle de movimentações de estoque através dos tipos:
+O sistema permite registrar movimentações de entrada e saída de produtos.
 
-* `ENTRADA`
-* `SAIDA`
+Tipos de movimentação:
 
-As movimentações possuem:
+- `ENTRADA`: adiciona unidades ao estoque.
+- `SAIDA`: retira unidades do estoque.
 
-* Tipo da movimentação
-* Quantidade
-* Data e hora
-* Produto relacionado
+As movimentações registram informações como tipo, quantidade, data e produto relacionado. Nas saídas, a aplicação verifica se existe quantidade suficiente para evitar estoque negativo.
 
-Nas entradas, a quantidade é adicionada ao estoque.
+### 🔐 Autenticação e autorização
 
-Nas saídas, a aplicação verifica se existe quantidade suficiente antes de realizar a operação, evitando que o estoque fique negativo.
+A API utiliza **Spring Security e JWT (JSON Web Token)** para autenticar usuários e proteger os endpoints.
 
----
+Funcionalidades de segurança:
+
+- Autenticação de usuários.
+- Geração e validação de tokens JWT.
+- Senhas armazenadas com hash BCrypt.
+- Controle de acesso baseado em roles.
+- Restrição de operações administrativas.
+- Proteção de endpoints por autenticação e autorização.
+
+As operações de cadastro, atualização e exclusão de produtos, categorias e fornecedores são restritas a usuários com a role `ADMIN`, conforme as regras configuradas na aplicação.
+
+O cadastro público de usuários deve criar contas com a role `USER`. A criação de contas administrativas deve ser restrita a administradores autorizados.
+
+### 📧 Alertas automáticos por e-mail
+
+A aplicação possui integração com SMTP para envio de notificações por e-mail.
+
+O sistema verifica periodicamente os produtos com estoque baixo e envia uma notificação contendo os produtos que precisam de reposição.
+
+Funcionalidades:
+
+- Verificação automática dos níveis de estoque.
+- Identificação de produtos abaixo do limite configurado.
+- Envio de alertas por e-mail.
+- Configuração do destinatário e das credenciais por variáveis de ambiente.
+
+O limite de estoque baixo é configurável. Na configuração atual de desenvolvimento, o limite utilizado é de 10 unidades.
+
+### ⚠️ Validação e tratamento de exceções
+
+A API utiliza Jakarta Validation para validar os dados recebidos e exceções personalizadas para tratar situações de negócio.
+
+Entre os recursos implementados estão:
+
+- Validação de campos obrigatórios e formatos.
+- Tratamento de recursos não encontrados.
+- Tratamento de violações de regras de negócio.
+- Respostas HTTP adequadas aos erros tratados.
+- Centralização do tratamento de exceções com `@RestControllerAdvice`.
 
 ## 🛠️ Tecnologias utilizadas
 
-* **Java 25**
-* **Spring Boot 4.1.1**
-* **Spring Web MVC**
-* **Spring Data JPA**
-* **Hibernate**
-* **MySQL**
-* **Maven**
-* **Lombok**
-* **MapStruct**
-* **Jakarta Validation**
-* **Git**
-* **GitHub**
-
-A configuração atual do projeto utiliza Java 25, Spring Boot 4.1.1, Spring Data JPA, MySQL, MapStruct e Lombok.
-
----
+- **Java 25**
+- **Spring Boot 4.1.1**
+- Spring Web MVC
+- Spring Data JPA
+- Hibernate
+- MySQL
+- Spring Security
+- JWT
+- BCrypt
+- Spring Boot Starter Mail / JavaMailSender
+- Jakarta Validation
+- Lombok
+- MapStruct
+- Maven
+- Git e GitHub
+- Postman
 
 ## 🏗️ Arquitetura
 
-O projeto utiliza uma organização baseada em camadas:
+O projeto utiliza arquitetura em camadas para separar as responsabilidades e facilitar a manutenção.
 
 ```text
-src
-└── main
-    └── java
-        └── com.miguelsouza.estoque
-            ├── controller
-            ├── service
-            ├── repository
-            ├── entities
-            ├── dto
-            ├── mapper
-            └── exceptions
+src/main/java/com/miguelsouza/estoque
+├── controller
+├── service
+├── repository
+├── entities
+├── dto
+├── mapper
+├── exceptions
+└── config
 ```
 
 ### Controller
 
-Responsável por receber as requisições HTTP e disponibilizar os endpoints da API.
-
-Exemplo:
-
-```text
-POST   /products
-GET    /products
-GET    /products/{id}
-PUT    /products/{id}
-DELETE /products/{id}
-```
-
-A API utiliza `ResponseEntity` para controlar os status HTTP retornados ao cliente.
+Recebe as requisições HTTP, encaminha as operações para os serviços e retorna as respostas da API.
 
 ### Service
 
-Concentra as regras de negócio da aplicação.
-
-Um exemplo importante está nas movimentações de estoque, onde o serviço verifica o produto, atualiza sua quantidade e impede uma saída maior que o estoque disponível.
+Concentra as regras de negócio, como validação de operações, movimentações de estoque e verificação de produtos com estoque baixo.
 
 ### Repository
 
-Responsável pela comunicação com o banco de dados utilizando **Spring Data JPA**.
+Responsável pelo acesso aos dados utilizando Spring Data JPA.
 
 ### Entities
 
-Representam as entidades persistidas no banco de dados.
+Representam as entidades persistidas no banco de dados, como produtos, categorias, fornecedores, movimentações e usuários.
 
-Principais entidades:
+### DTOs e mapeamento
 
-```text
-Product
-Category
-Supplier
-Movement
-```
+Os DTOs definem os dados utilizados nas requisições e respostas. O MapStruct auxilia no mapeamento entre objetos, reduzindo código repetitivo.
 
----
+### Exceptions
 
-## 🔗 Relacionamentos
+Centraliza as exceções personalizadas e o tratamento de erros da aplicação.
 
-O projeto utiliza diferentes tipos de relacionamentos do JPA.
+### Segurança
 
-### Produto → Categoria
+O Spring Security controla a autenticação e a autorização das requisições, enquanto o filtro JWT identifica os usuários autenticados.
 
-Um produto pertence a uma categoria:
+## 🔗 Relacionamentos entre entidades
+
+### Produto e categoria
+
+Um produto pertence a uma categoria.
 
 ```text
 Category 1 ──────── N Product
 ```
 
-### Produto ↔ Fornecedor
+### Produto e fornecedor
 
-Um produto pode possuir vários fornecedores e um fornecedor pode estar relacionado a vários produtos:
+Um produto pode estar associado a vários fornecedores, e um fornecedor pode fornecer vários produtos.
 
 ```text
 Product N ──────── N Supplier
 ```
 
-Esse relacionamento utiliza uma tabela intermediária chamada:
+Esse relacionamento utiliza uma tabela intermediária no banco de dados.
 
-```text
-produto_fornecedor
-```
+### Produto e movimentações
 
-### Produto → Movimentações
-
-Um produto pode possuir várias movimentações:
+Um produto pode possuir várias movimentações de estoque.
 
 ```text
 Product 1 ──────── N Movement
 ```
 
-Esses relacionamentos são implementados utilizando as anotações do JPA, como `@ManyToOne`, `@OneToMany` e `@ManyToMany`.
-
----
-
-## 📋 Validação
-
-A API utiliza **Jakarta Validation** para validar os dados recebidos.
-
-Entre as validações implementadas estão:
-
-* Campos obrigatórios
-* Valores positivos
-* Tamanho máximo de campos
-* Formato de e-mail
-* Validação de CNPJ
-* Validação de telefone
-* Categoria obrigatória
-* Produto obrigatório em movimentações
-
-Exemplo:
-
-```java
-@NotNull(message = "Quantidade é obrigatória")
-@Positive(message = "Quantidade deve ser positiva")
-private Integer quantity;
-```
-
----
-
-## 🔄 Exemplo de movimentação
-
-### Entrada
-
-```http
-POST /movements
-```
-
-```json
-{
-  "type": "ENTRADA",
-  "quantity": 10,
-  "product": {
-    "id": 1
-  }
-}
-```
-
-A quantidade será adicionada ao estoque do produto.
-
-### Saída
-
-```http
-POST /movements
-```
-
-```json
-{
-  "type": "SAIDA",
-  "quantity": 3,
-  "product": {
-    "id": 1
-  }
-}
-```
-
-Antes de realizar a saída, a aplicação verifica se o produto possui quantidade suficiente em estoque.
-
----
+Os relacionamentos são mapeados utilizando anotações do JPA, como `@ManyToOne`, `@OneToMany` e `@ManyToMany`.
 
 ## 🌐 Principais endpoints
 
-### Products
+Os endpoints abaixo representam as rotas principais da aplicação. As permissões devem ser conferidas na configuração de segurança.
 
-| Método   | Endpoint         | Descrição                 |
-| -------- | ---------------- | ------------------------- |
-| `GET`    | `/products`      | Lista e pesquisa produtos |
-| `GET`    | `/products/{id}` | Busca produto por ID      |
-| `POST`   | `/products`      | Cadastra produto          |
-| `PUT`    | `/products/{id}` | Atualiza produto          |
-| `DELETE` | `/products/{id}` | Remove produto            |
+### Autenticação
 
-A consulta de produtos permite utilizar parâmetros como `name` e `id`.
+| Método | Endpoint | Descrição |
+|---|---|---|
+| POST | `/auth/login` | Autenticação do usuário |
+| POST | `/auth/register` | Cadastro público de usuário |
 
-Exemplo:
+Após a autenticação, utilize o token JWT nas requisições protegidas, no cabeçalho:
 
 ```http
-GET /products?name=Notebook
+Authorization: Bearer SEU_TOKEN_JWT
 ```
 
-### Movements
+### Produtos
 
-| Método | Endpoint          | Descrição                 |
-| ------ | ----------------- | ------------------------- |
-| `GET`  | `/movements`      | Lista movimentações       |
-| `GET`  | `/movements/{id}` | Busca movimentação        |
-| `POST` | `/movements`      | Registra entrada ou saída |
+| Método | Endpoint | Descrição |
+|---|---|---|
+| GET | `/products` | Listar e pesquisar produtos |
+| GET | `/products/{id}` | Buscar produto por ID |
+| POST | `/products` | Cadastrar produto |
+| PUT | `/products/{id}` | Atualizar produto |
+| DELETE | `/products/{id}` | Excluir produto |
 
----
+### Categorias
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| GET | `/categories` | Consultar categorias |
+| POST | `/categories` | Cadastrar categoria |
+| PUT | `/categories/{id}` | Atualizar categoria |
+| DELETE | `/categories/{id}` | Excluir categoria |
+
+### Fornecedores
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| GET | `/suppliers` | Consultar fornecedores |
+| POST | `/suppliers` | Cadastrar fornecedor |
+| PUT | `/suppliers/{id}` | Atualizar fornecedor |
+| DELETE | `/suppliers/{id}` | Excluir fornecedor |
+
+### Movimentações
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| GET | `/movements` | Consultar movimentações |
+| GET | `/movements/{id}` | Buscar movimentação por ID |
+| POST | `/movements` | Registrar entrada ou saída |
+
+**Observação:** confirme os métodos e caminhos diretamente nos controllers antes de considerar esta tabela como uma especificação completa da API. O endpoint de alerta de estoque baixo também deve ser documentado conforme a rota realmente implementada.
 
 ## 🗄️ Banco de dados
 
-O projeto utiliza **MySQL** como banco de dados relacional.
+O projeto utiliza MySQL como banco de dados relacional e Spring Data JPA com Hibernate para persistência.
 
-Principais tabelas:
+As principais entidades incluem:
 
-```text
-categoria
-produtos
-fornecedor
-produto_fornecedor
-movimentacao
-```
+- Produtos.
+- Categorias.
+- Fornecedores.
+- Movimentações.
+- Usuários.
 
-Os relacionamentos entre as entidades são mapeados utilizando **JPA/Hibernate**.
-
----
+As credenciais do banco de dados não devem ser armazenadas diretamente no código-fonte. Configure-as de acordo com o ambiente de execução.
 
 ## ⚙️ Como executar o projeto
 
-### 1. Clone o repositório
+### 1. Pré-requisitos
+
+- JDK compatível com Java 25.
+- MySQL instalado e em execução.
+- Maven ou Maven Wrapper.
+- Git.
+
+### 2. Clone o repositório
 
 ```bash
 git clone https://github.com/MiguelSouza011/estoque.git
-```
-
-### 2. Entre no diretório
-
-```bash
 cd estoque
 ```
 
 ### 3. Configure o banco de dados
 
-Crie um banco MySQL e configure as credenciais utilizadas pela aplicação.
+Crie o banco de dados utilizado pela aplicação e configure a URL, o usuário e a senha nas propriedades ou variáveis de ambiente correspondentes ao seu projeto.
 
-Exemplo:
+Exemplo de configuração:
 
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/estoque
-spring.datasource.username=root
-spring.datasource.password=SUA_SENHA
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
 ```
 
-> As configurações podem variar de acordo com o ambiente de desenvolvimento.
+Ajuste os nomes das propriedades conforme a configuração efetiva da aplicação.
 
-### 4. Execute a aplicação
+### 4. Configure o envio de e-mails
 
-Com Maven:
+Para utilizar o SMTP do Gmail, configure as variáveis de ambiente necessárias:
 
-```bash
-mvn spring-boot:run
+```text
+MAIL_USERNAME=seu_email@gmail.com
+MAIL_PASSWORD=sua_senha_de_aplicativo
+STOCK_ALERT_RECIPIENT=email_destinatario@example.com
 ```
 
-Ou utilizando o Maven Wrapper:
+Utilize uma senha de aplicativo do Google quando necessário. Não publique senhas, tokens JWT ou outras credenciais no repositório.
 
-**Windows:**
+Configure também a variável de ambiente utilizada para o segredo JWT, de acordo com o `application.yml` da aplicação.
 
-```bash
+### 5. Execute a aplicação
+
+No Windows, utilizando o Maven Wrapper:
+
+```powershell
 .\mvnw.cmd spring-boot:run
 ```
 
-**Linux/macOS:**
+No Linux ou macOS:
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
----
+A aplicação utiliza a porta configurada no projeto, normalmente `8080`.
 
 ## 🧪 Testando a API
 
-Depois de iniciar a aplicação, os endpoints podem ser testados utilizando ferramentas como:
+Utilize Postman, Insomnia, Bruno ou o cliente HTTP do IntelliJ para testar os endpoints.
 
-* Postman
-* Insomnia
-* Bruno
-* IntelliJ HTTP Client
+Recomenda-se validar os seguintes cenários:
 
-Exemplo:
-
-```http
-GET http://localhost:8080/products
-```
-
----
+- Login com credenciais válidas e inválidas.
+- Acesso a rotas protegidas com e sem JWT.
+- Tentativa de operação administrativa com um usuário `USER`.
+- Cadastro de usuários e controle de roles.
+- Operações CRUD de produtos, categorias e fornecedores.
+- Entradas e saídas de estoque.
+- Tentativa de retirada de quantidade superior à disponível.
+- Validação de dados inválidos.
+- Busca de recursos inexistentes.
+- Envio manual de e-mail, se o endpoint de teste estiver habilitado.
+- Envio automático de alertas quando houver produtos com estoque baixo.
 
 ## 📚 Conceitos praticados
 
-Durante o desenvolvimento deste projeto foram aplicados conceitos importantes de backend:
+Durante o desenvolvimento foram trabalhados conceitos importantes de desenvolvimento backend:
 
-* Java
-* Programação Orientada a Objetos
-* Spring Boot
-* APIs REST
-* HTTP
-* CRUD
-* Spring Data JPA
-* Hibernate
-* ORM
-* Relacionamentos entre entidades
-* MySQL
-* DTO
-* MapStruct
-* Lombok
-* Jakarta Validation
-* Tratamento de exceções
-* Regras de negócio
-* Streams e Lambdas
-* Arquitetura em camadas
-* Maven
-* Git e GitHub
-
----
-
-## 📌 Próximos passos
-
-O projeto continua em desenvolvimento e pode receber novas funcionalidades, como:
-
-* Documentação da API com OpenAPI/Swagger
-* Paginação
-* Ordenação e filtros mais avançados
-* Testes unitários
-* Testes de integração
-* Docker e Docker Compose
-* Autenticação e autorização
-* Monitoramento
-* Deploy em ambiente cloud
-
----
+- Java e Programação Orientada a Objetos.
+- Spring Boot e APIs REST.
+- Arquitetura em camadas.
+- Spring Data JPA e Hibernate.
+- Mapeamento objeto-relacional.
+- DTOs e MapStruct.
+- Lombok.
+- Jakarta Validation.
+- Tratamento global de exceções.
+- Regras de negócio.
+- Relacionamentos entre entidades.
+- Spring Security.
+- Autenticação JWT.
+- Autorização baseada em roles.
+- Hash de senhas com BCrypt.
+- Integração SMTP para envio de e-mails.
+- Agendamento de tarefas.
+- Maven.
+- Git e GitHub.
+- Testes manuais de APIs com Postman.
 
 ## 👨‍💻 Autor
 
 **Miguel Souza**
 
-Estudante de Engenharia de Software com foco em desenvolvimento backend utilizando **Java e Spring Boot**.
+Estudante de Engenharia de Software com foco em desenvolvimento backend utilizando Java e Spring Boot.
 
-O projeto faz parte da minha jornada de estudos e tem como objetivo transformar conceitos aprendidos em aplicações práticas, aprofundando conhecimentos em desenvolvimento de APIs, bancos de dados e regras de negócio.
+Este projeto faz parte da minha jornada de aprendizado em desenvolvimento de software e demonstra a aplicação prática de conceitos de APIs REST, persistência de dados, segurança, regras de negócio e integração com serviços externos.
 
 ---
 
-⭐ Se este projeto foi útil ou interessante para você, fique à vontade para deixar uma estrela no repositório.
+⭐ Se este projeto foi útil ou interessante, fique à vontade para deixar uma estrela no repositório.
