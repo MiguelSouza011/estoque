@@ -5,19 +5,25 @@ import com.miguelsouza.estoque.entities.Product;
 import com.miguelsouza.estoque.exceptions.ResourceNotFoundException;
 import com.miguelsouza.estoque.repository.CategoryRepository;
 import com.miguelsouza.estoque.repository.ProductRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository repository;
     private final CategoryRepository categoryRepository;
+
+    @Value("${stock.low-threshold:10}")
+    private  Integer lowStockThreshold;
 
     public Product insert(Product obj) {
 
@@ -34,8 +40,8 @@ public class ProductService {
         return repository.save(obj);
     }
 
-    public List<Product> findAll() {
-        return repository.findAll();
+    public Page<Product> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
 
@@ -72,7 +78,7 @@ public class ProductService {
         repository.deleteById(id);
     }
 
-    public List<Product> findByExample(Integer id, String name) {
+    public Page<Product> findByExample(Integer id, String name, Pageable pageable) {
 
         Product product = new Product();
 
@@ -87,6 +93,14 @@ public class ProductService {
 
         Example<Product> example = Example.of(product, matcher);
 
-        return repository.findAll(example);
+        return repository.findAll(example, pageable);
+    }
+
+
+    public List<Product> findLowStock() {
+        return repository
+                .findByQuantityLessThanEqualOrderByQuantityAsc(
+                        lowStockThreshold
+                );
     }
 }

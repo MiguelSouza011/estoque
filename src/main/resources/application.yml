@@ -3,10 +3,17 @@ spring:
     name: estoque
 
   datasource:
+<<<<<<< HEAD
     url: jdbc:mysql://localhost:3306/estoque
     username: SEU_USERNAME
     password: SUA_SENHA
     driver-class-name: com.mysql.cj.jdbc.Driver
+=======
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: ${DB_DRIVER}
+>>>>>>> 59f81e5 (Implementando autenticacao e autorizacao e envio automatico de emails de alerta)
 
   jpa:
     hibernate:
@@ -15,3 +22,28 @@ spring:
     properties:
       hibernate:
         format_sql: true
+<<<<<<< HEAD
+=======
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+api:
+  security:
+    token:
+      secret: ${JWT_SECRET:my-secret-key}
+
+stock:
+  low-threshold: 10
+
+
+>>>>>>> 59f81e5 (Implementando autenticacao e autorizacao e envio automatico de emails de alerta)

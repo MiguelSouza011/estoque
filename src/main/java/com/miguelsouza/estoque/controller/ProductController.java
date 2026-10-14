@@ -1,11 +1,14 @@
 package com.miguelsouza.estoque.controller;
 
 import com.miguelsouza.estoque.dto.ProductDTO;
+import com.miguelsouza.estoque.dto.LowStockResponse;
 import com.miguelsouza.estoque.entities.Product;
 import com.miguelsouza.estoque.mapper.ProductMapper;
 import com.miguelsouza.estoque.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,12 +52,25 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductDTO>> find(
+    public ResponseEntity<Page<ProductDTO>> find(
             @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "id", required = false) Integer id){
-        List<Product> result = service.findByExample(id, name);
-        List<ProductDTO> dto = result.stream().map(mapper::toDTO).toList();
+            @RequestParam(value = "id", required = false) Integer id,
+            Pageable pageable){
+        Page<Product> result = service.findByExample(id, name, pageable);
+        Page<ProductDTO> dto = result.map(mapper::toDTO);
         return ResponseEntity.ok(dto);
     }
+
+    @GetMapping("/low-stock")
+    public ResponseEntity<List<ProductDTO>> findLowStock() {
+
+        List<ProductDTO> products = service.findLowStock()
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
+
+        return ResponseEntity.ok(products);
+    }
+
 
 }

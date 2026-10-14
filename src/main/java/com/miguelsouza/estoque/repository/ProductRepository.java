@@ -10,4 +10,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<Product> findByName(String name);
 
     List<Product> findByNameAndId(String name, Integer id);
+
+    List<Product> findByQuantityLessThanEqualOrderByQuantityAsc(
+            Integer quantity
+    );
 }
